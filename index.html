@@ -23,7 +23,7 @@ body{background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFon
 .conn-dot{width:7px;height:7px;border-radius:50%;background:#6b7280;transition:background .3s}
 .conn-dot.ok{background:#4ade80}.conn-dot.err{background:#f87171}
 
-.tabs-wrap{background:var(--bg2);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 12px;position:sticky;top:57px;z-index:19;display:flex;gap:6px;overflow-x:auto}
+.tabs-wrap{background:var(--bg2);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 12px;position:sticky;top:57px;z-index:19;display:flex;flex-wrap:wrap;gap:6px;overflow-x:clip}
 .tabs-wrap::-webkit-scrollbar{display:none}
 .tab{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;border:none;background:var(--tab-bg);color:var(--muted);transition:all .15s}
 .tab:hover{background:var(--tab-active);color:rgba(255,255,255,.7)}
@@ -87,8 +87,7 @@ table.rank td:nth-child(2){text-align:left}
 .br-score.winner{color:var(--primary)}
 
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:48px 20px}
-.schedule-notice{display:none;position:sticky;top:104px;z-index:19;background:#1a1d27;border-top:1px solid rgba(246,201,14,.4);border-bottom:1px solid rgba(246,201,14,.4);padding:8px 14px;font-size:10px;font-weight:700;color:rgba(246,201,14,.95);text-align:center;}
-#view-schedule.active + * + .body .schedule-notice, .show-schedule-notice{display:block;}
+.schedule-notice{display:none;background:var(--bg2);border-bottom:2px solid rgba(246,201,14,.4);padding:8px 14px;font-size:10px;font-weight:700;color:rgba(246,201,14,.95);text-align:center;}
 .footer{text-align:center;color:rgba(255,255,255,.1);font-size:10px;padding:20px}
 </style>
 </head>
@@ -110,10 +109,9 @@ table.rank td:nth-child(2){text-align:left}
   <button class="tab" onclick="switchTab('rank')" id="tab-rank">📊 Classement</button>
   <button class="tab" onclick="switchTab('bracket')" id="tab-bracket">🏆 Tableau</button>
   <button class="tab" onclick="switchTab('schedule')" id="tab-schedule">🕐 Horaires</button>
+  <div id="schedule-notice" class="schedule-notice">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
 </div>
 
-<div class="schedule-notice" id="schedule-notice">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
-<div class="schedule-notice" id="schedule-notice">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
 <div class="body">
   <div class="view active" id="view-live"><div class="empty">⏳ Connexion…</div></div>
   <div class="view" id="view-rank"><div class="empty">⏳ Connexion…</div></div>
