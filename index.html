@@ -113,7 +113,7 @@ table.rank td:nth-child(2){text-align:left}
 </div>
 
 <div class="schedule-notice" id="schedule-notice">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
-<div id="schedule-notice" style="display:none;position:fixed;top:103px;left:0;right:0;z-index:100;background:#1a1d27;border-bottom:2px solid rgba(246,201,14,.5);padding:7px 16px;font-size:10px;font-weight:700;color:rgba(246,201,14,.95);text-align:center;">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
+<div id="schedule-notice" style="display:none;position:fixed;top:104px;left:0;right:0;z-index:100;background:#1a1d27;border-bottom:2px solid rgba(246,201,14,.5);padding:7px 16px;font-size:10px;font-weight:700;color:rgba(246,201,14,.95);text-align:center;">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
 <div class="body">
   <div class="view active" id="view-live"><div class="empty">⏳ Connexion…</div></div>
   <div class="view" id="view-rank"><div class="empty">⏳ Connexion…</div></div>
@@ -148,6 +148,7 @@ function switchTab(tab) {
   document.getElementById('view-' + tab).classList.add('active');
   const sn = document.getElementById('schedule-notice');
   if (sn) sn.style.display = tab === 'schedule' ? 'block' : 'none';
+  document.querySelector('.body').style.paddingTop = tab === 'schedule' ? '44px' : '0';
 }
 
 function setStatus(ok) {
@@ -452,8 +453,7 @@ function renderSchedule(slots, settings) {
       </div>`;
     });
   });
-  const spacer='<div style="height:36px"></div>';
-document.getElementById('schedule-inner').innerHTML=spacer+(h||'<div class="empty">Aucun match</div>');
+  document.getElementById('schedule-inner').innerHTML=h||'<div class="empty">Aucun match</div>';
 }
 
 // ── STANDINGS ─────────────────────────────────────────────────────────────────
