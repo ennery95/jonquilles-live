@@ -109,6 +109,8 @@ table.rank td:nth-child(2){text-align:left}
   <button class="tab" onclick="switchTab('rank')" id="tab-rank">📊 Classement</button>
   <button class="tab" onclick="switchTab('bracket')" id="tab-bracket">🏆 Tableau</button>
   <button class="tab" onclick="switchTab('schedule')" id="tab-schedule">🕐 Horaires</button>
+  <button class="tab" onclick="switchTab('scorers')" id="tab-scorers">⚽ Buteurs</button>
+  <button class="tab" onclick="switchTab('donation')" id="tab-donation">💚 Dons</button>
   <div id="schedule-notice" class="schedule-notice">⚠ Les horaires sont à titre indicatif et peuvent évoluer à tout moment</div>
 </div>
 
@@ -116,6 +118,8 @@ table.rank td:nth-child(2){text-align:left}
   <div class="view active" id="view-live"><div class="empty">⏳ Connexion…</div></div>
   <div class="view" id="view-rank"><div class="empty">⏳ Connexion…</div></div>
   <div class="view" id="view-bracket"><div class="empty">⏳ Connexion…</div></div>
+  <div class="view" id="view-scorers"><div class="empty">⏳ Connexion…</div></div>
+  <div class="view" id="view-donation"><div class="empty">⏳ Connexion…</div></div>
   <div class="view" id="view-schedule">
     <div id="schedule-inner"><div class="empty">⏳ Connexion…</div></div>
   </div>
@@ -466,6 +470,86 @@ function stnd(g, matches) {
     else{s[m.team1Id].drawn++;s[m.team1Id].points++;s[m.team2Id].drawn++;s[m.team2Id].points++;}
   });
   return Object.values(s).sort((a,b)=>b.points-a.points||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+}
+
+
+// ── BUTEURS ───────────────────────────────────────────────────────────────────
+function renderScorers(matches, teams) {
+  // Construire map joueur → infos
+  const playerMap = {};
+  toArr(teams).forEach(team => {
+    toArr(team.players).forEach(p => {
+      if (p.id && p.name) playerMap[p.id] = { name: p.name, teamId: team.id, teamName: team.name, _c: team.color || '#888' };
+    });
+  });
+
+  // Compter les buts par joueur
+  const scorerCount = {};
+  toArr(matches).forEach(m => {
+    toArr(m.goals).forEach(g => {
+      if (!g.scorerId) return;
+      if (!scorerCount[g.scorerId]) scorerCount[g.scorerId] = 0;
+      scorerCount[g.scorerId]++;
+    });
+  });
+
+  const sorted = Object.entries(scorerCount)
+    .map(([id, goals]) => ({ id, goals, ...playerMap[id] }))
+    .filter(s => s.name)
+    .sort((a, b) => b.goals - a.goals);
+
+  if (!sorted.length) {
+    document.getElementById('view-scorers').innerHTML = '<div class="empty">Aucun buteur enregistré</div>';
+    return;
+  }
+
+  let h = '<div class="rank-group"><div class="rank-group-title">Classement des buteurs</div><table class="rank"><thead><tr><th>#</th><th>Joueur</th><th>Équipe</th><th>⚽</th></tr></thead><tbody>';
+  let rank = 1, prevGoals = -1, sameRank = 0;
+  sorted.forEach((s, i) => {
+    if (s.goals !== prevGoals) { rank = i + 1; sameRank = 0; } else sameRank++;
+    prevGoals = s.goals;
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    h += `<tr>
+      <td><span class="rk-pos ${rank<=3?'q':''}">${medal}</span></td>
+      <td style="text-align:left;color:#fff;font-weight:600">${s.name}</td>
+      <td style="text-align:left"><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${s._c};display:inline-block;flex-shrink:0"></span><span style="color:var(--muted);font-size:11px">${s.teamName||''}</span></span></td>
+      <td><span class="rk-pts">${s.goals}</span></td>
+    </tr>`;
+  });
+  h += '</tbody></table></div>';
+  document.getElementById('view-scorers').innerHTML = h;
+}
+
+// ── DONS ─────────────────────────────────────────────────────────────────────
+function renderDonation(matches, settings) {
+  const totalGoals = toArr(matches).reduce((sum, m) => sum + toArr(m.goals).length, 0);
+  const amount = settings.donationAmount || 0;
+  const total = totalGoals * amount;
+  const donor = settings.donationDonor || '';
+  const msg = settings.donationMessage || '';
+
+  const h = `
+    <div class="card" style="text-align:center;padding:24px 16px">
+      <div style="font-size:36px;margin-bottom:8px">💚</div>
+      <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">${donor}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px">${msg}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:12px;padding:14px 8px">
+          <div style="font-size:28px;font-weight:700;color:#4ade80">${totalGoals}</div>
+          <div style="font-size:10px;color:var(--muted)">buts marqués</div>
+        </div>
+        <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:12px;padding:14px 8px">
+          <div style="font-size:28px;font-weight:700;color:#4ade80">${amount}€</div>
+          <div style="font-size:10px;color:var(--muted)">par but</div>
+        </div>
+        <div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);border-radius:12px;padding:14px 8px">
+          <div style="font-size:28px;font-weight:700;color:#4ade80">${total}€</div>
+          <div style="font-size:10px;color:var(--muted)">total</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.3)">Mis à jour en temps réel · ${totalGoals} but${totalGoals>1?'s':''} × ${amount}€ = ${total}€</div>
+    </div>`;
+  document.getElementById('view-donation').innerHTML = h;
 }
 
 connect();
