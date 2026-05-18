@@ -222,6 +222,13 @@ function render(d) {
   renderBracket(koMatches);
   renderSchedule(slots, settings);
   renderScorers(matches, teams, settings);
+  // Afficher/masquer onglet buteurs selon settings
+  const tabScorers = document.getElementById('tab-scorers');
+  if (tabScorers) tabScorers.style.display = settings.scorersEnabled ? '' : 'none';
+  // Si on est sur l'onglet buteurs mais qu'il est désactivé, basculer sur En cours
+  if (!settings.scorersEnabled && document.getElementById('view-scorers').classList.contains('active')) {
+    switchTab('live');
+  }
 }
 
 function phaseBadge(phase) {
