@@ -192,6 +192,7 @@ function connect() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render(d) {
+  window.__lastData = d; // debug
   const teams    = toArr(d.teams);
   const matches  = d.matches
     ? (Array.isArray(d.matches)
